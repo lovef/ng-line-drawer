@@ -3,4 +3,4 @@ node_js:
   - 8.10.0
 
 script:
-  - ng test --browsers ChromeHeadlessNoSandbox --watch=false
+  - ng test --browsers ChromeHeadlessNoSandbox --watch=false && ng lint

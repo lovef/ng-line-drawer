@@ -99,4 +99,22 @@ describe('Polygon', () => {
         }
         expect(iterated).toEqual(Array.from(polygon.getCircleIterable()))
     })
+
+    it('can calculate circle radius', () => {
+        const r = Math.random()
+        const polygon = new Polygon(Point.Zero, r, 4)
+        expect(polygon.calculateCircleRadius(0)).toEqual(0)
+        expect(polygon.calculateCircleRadius(1)).toBeCloseTo(r * Math.sqrt(0.5 * 0.5 * 2))
+        expect(polygon.calculateCircleRadius(2)).toBeCloseTo(r)
+        expect(polygon.calculateCircleRadius(3)).toEqual(r)
+    })
+
+    it('can be scaled', () => {
+        const scale = Math.random()
+        const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4)
+        const scaledUp = polygon.scale(scale)
+        expect(scaledUp.radius).toEqual(polygon.radius * scale)
+        expect(scaledUp.center).toEqual(polygon.center)
+        expect(scaledUp.circleCount).toEqual(polygon.circleCount)
+    })
 })

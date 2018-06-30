@@ -75,12 +75,14 @@ export class Polygon {
 
     points = []
     circleCount: number
+    angle: number
 
-    constructor(readonly center: Point, radius: number, pointsCount: number) {
+    constructor(readonly center: Point, readonly radius: number, readonly pointsCount: number) {
+        this.angle = 2 * Math.PI / pointsCount
         const startAngle = Math.PI / 2
         this.points = Array.from({ length: pointsCount }, (value, key) => new Point(
-            Math.cos(key * -2 * Math.PI / pointsCount + startAngle),
-            Math.sin(key * -2 * Math.PI / pointsCount + startAngle))
+            Math.cos(-key * this.angle + startAngle),
+            Math.sin(-key * this.angle + startAngle))
             .multiply(radius).plus(center))
 
         this.circleCount = Math.floor(pointsCount / 2)
@@ -95,5 +97,16 @@ export class Polygon {
 
     getCircleIterable(start = 0, end?: number): CircleIterable {
         return new CircleIterable(this, start, end || this.circleCount - 1)
+    }
+
+    calculateCircleRadius(circleIndex: number): number {
+        if (circleIndex >= this.circleCount) {
+            return this.radius
+        }
+        return this.radius * Math.sin(this.angle * circleIndex / 2)
+    }
+
+    scale(scale: number): Polygon {
+        return new Polygon(this.center, this.radius * scale, this.pointsCount)
     }
 }

@@ -1,27 +1,37 @@
-import { TestBed, async } from '@angular/core/testing'
+import { TestBed, async, ComponentFixture } from '@angular/core/testing'
 import { AppComponent } from './app.component'
+import { ElementRef } from '@angular/core'
+
+
 describe('AppComponent', () => {
+
+  let fixture: ComponentFixture<AppComponent>
+  let app: AppComponent
+
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent
       ],
     }).compileComponents()
+    fixture = TestBed.createComponent(AppComponent)
+    app = fixture.debugElement.componentInstance
   }))
+
   it('should create the app', async(() => {
-    const fixture = TestBed.createComponent(AppComponent)
-    const app = fixture.debugElement.componentInstance
     expect(app).toBeTruthy()
   }))
+
   it(`should have correct title`, async(() => {
-    const fixture = TestBed.createComponent(AppComponent)
-    const app = fixture.debugElement.componentInstance
     expect(app.title).toEqual('line-drawer')
   }))
-  it('should render title in a h1 tag', async(() => {
-    const fixture = TestBed.createComponent(AppComponent)
-    fixture.detectChanges()
-    const compiled = fixture.debugElement.nativeElement
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to line-drawer!')
+
+  it(`canvas should fill the screen`, async(() => {
+    app.ngOnInit()
+
+    expect(app.canvas).toBeDefined()
+    expect(app.canvas.nativeElement.width).toEqual(window.innerWidth)
+    expect(app.canvas.nativeElement.height).toEqual(window.innerHeight)
   }))
 })

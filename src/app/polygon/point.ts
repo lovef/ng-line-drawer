@@ -14,8 +14,16 @@ export class Point {
         return new Point(this.x + point.x, this.y + point.y)
     }
 
+    minus(point: Point): Point {
+        return new Point(this.x - point.x, this.y - point.y)
+    }
+
     multiply(multiplier: number): Point {
         return new Point(this.x * multiplier, this.y * multiplier)
+    }
+
+    length(): number {
+        return Math.sqrt(this.x * this.x + this.y * this.y)
     }
 
     toString() {

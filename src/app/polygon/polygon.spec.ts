@@ -111,10 +111,32 @@ describe('Polygon', () => {
 
     it('can be scaled', () => {
         const scale = Math.random()
+        const position = new Point(Math.random(), Math.random())
+        const polygon = new Polygon(new Point(1 + Math.random(), 1 + Math.random()), 1, 4)
+        const centerDiff = polygon.center.minus(position)
+
+        const newPolygon = polygon.scale(position, scale)
+
+        expect(newPolygon.radius).toEqual(polygon.radius * scale)
+        expect(newPolygon.center).toEqual(position.plus(centerDiff.multiply(scale)))
+        expect(newPolygon.circleCount).toEqual(polygon.circleCount)
+    })
+
+    it('can change radius', () => {
+        const newRadius = Math.random()
         const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4)
-        const scaledUp = polygon.scale(scale)
-        expect(scaledUp.radius).toEqual(polygon.radius * scale)
-        expect(scaledUp.center).toEqual(polygon.center)
-        expect(scaledUp.circleCount).toEqual(polygon.circleCount)
+        const newPolygon = polygon.changeRadiusTo(newRadius)
+        expect(newPolygon.radius).toEqual(newRadius)
+        expect(newPolygon.center).toEqual(polygon.center)
+        expect(newPolygon.circleCount).toEqual(polygon.circleCount)
+    })
+
+    it('can be moved', () => {
+        const newPosition = new Point(Math.random(), Math.random())
+        const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4)
+        const newPolygon = polygon.moveTo(newPosition)
+        expect(newPolygon.radius).toEqual(polygon.radius)
+        expect(newPolygon.center).toBe(newPosition)
+        expect(newPolygon.circleCount).toEqual(polygon.circleCount)
     })
 })

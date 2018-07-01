@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core'
-import { Polygon } from './polygon/polygon'
 import { Point } from './polygon/point'
+import { PolygonView } from './polygon/polygonView'
 
 @Component({
     selector: 'app-root',
@@ -9,16 +9,54 @@ import { Point } from './polygon/point'
 })
 export class AppComponent implements OnInit {
 
+    polygonView: PolygonView
+    lastMousePosition: Point
+    mouseDown = false
+
     title = 'line-drawer'
     @ViewChild('canvas') canvas: ElementRef
 
     ngOnInit(): void {
+        this.polygonView = new PolygonView(window.innerWidth, window.innerHeight)
         this.draw()
     }
 
     @HostListener('window:resize', ['$event'])
     onResize(event) {
+        this.polygonView.resize(window.innerWidth, window.innerHeight)
         this.draw()
+    }
+
+    @HostListener('mousewheel', ['$event'])
+    onMouseWheel(event: WheelEvent) {
+        if (event.wheelDeltaY > 0) {
+            this.polygonView.scale(new Point(event.x, event.y), 1.1)
+            this.draw()
+        } else if (event.wheelDeltaY < 0) {
+            this.polygonView.scale(new Point(event.x, event.y), 1 / 1.1)
+            this.draw()
+        }
+    }
+
+    @HostListener('mousedown', ['$event'])
+    onMouseDown(event: MouseEvent) {
+        this.lastMousePosition = new Point(event.x, event.y)
+        this.mouseDown = true
+    }
+
+    @HostListener('mouseup', ['$event'])
+    onMouseUp(event: MouseEvent) {
+        this.mouseDown = false
+    }
+
+    @HostListener('mousemove', ['$event'])
+    onMousemove(event: MouseEvent) {
+        if (this.mouseDown) {
+            const position = new Point(event.x, event.y)
+            this.polygonView.move(position.minus(this.lastMousePosition))
+            this.lastMousePosition = position
+            this.draw()
+        }
     }
 
     draw() {
@@ -38,11 +76,9 @@ export class AppComponent implements OnInit {
             '#A000C0'
         ].reverse()
 
-        let polygon = new Polygon(new Point(0, window.innerHeight), 1, 87)
-        polygon = polygon.scale(Math.min(window.innerWidth, window.innerHeight) / polygon.calculateCircleRadius(7))
         let i = 0
         ctx.lineWidth = 1.3
-        for (const circle of polygon.getCircleIterable()) {
+        for (const circle of this.polygonView.polygon.getCircleIterable()) {
             ctx.strokeStyle = colors[i++]
             for (const line of circle) {
                 ctx.beginPath()

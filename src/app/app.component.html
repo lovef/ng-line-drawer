@@ -1,1 +1,16 @@
-<canvas #canvas></canvas>
+<div #overlay id="overlay">
+    <textarea #config tabindex="0" cols="30"
+        [(ngModel)]="configuration" (focus)="showOverlay()" ng-blur="hideOverlayCountdown()">
+    </textarea>
+</div>
+<canvas #canvas
+    tabindex="1"
+    (mousedown)="onMouseDown($event)"
+    (mouseup)="onMouseUp($event)"
+    (mousemove)="onMousemove($event)"
+    (mousewheel)="onMouseWheel($event)"
+    (touchstart)="onTouchstart($event)"
+    (touchmove)="onTouchmove($event)"
+    (touchend)="onTouchcancel($event)"
+    (touchcancel)="onTouchcancel($event)"
+></canvas>

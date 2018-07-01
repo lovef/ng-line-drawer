@@ -36,4 +36,8 @@ export class PolygonView {
     move(delta: Point) {
         this.polygon = this.polygon.moveTo(this.polygon.center.plus(delta))
     }
+
+    rotate(delta: number) {
+        this.polygon = this.polygon.rotate(delta)
+    }
 }

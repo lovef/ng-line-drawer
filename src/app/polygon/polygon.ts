@@ -106,7 +106,17 @@ export class Polygon {
         return this.radius * Math.sin(this.angle * circleIndex / 2)
     }
 
-    scale(scale: number): Polygon {
-        return new Polygon(this.center, this.radius * scale, this.pointsCount)
+    scale(position: Point, scale: number): Polygon {
+        const centerDiff = this.center.minus(position)
+        const newCenter = position.plus(centerDiff.multiply(scale))
+        return new Polygon(newCenter, this.radius * scale, this.pointsCount)
+    }
+
+    changeRadiusTo(newRadius: number): Polygon {
+        return new Polygon(this.center, newRadius, this.pointsCount)
+    }
+
+    moveTo(position: Point): Polygon {
+        return new Polygon(position, this.radius, this.pointsCount)
     }
 }

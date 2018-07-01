@@ -112,7 +112,7 @@ describe('Polygon', () => {
     it('can be scaled', () => {
         const scale = Math.random()
         const position = new Point(Math.random(), Math.random())
-        const polygon = new Polygon(new Point(1 + Math.random(), 1 + Math.random()), 1, 4)
+        const polygon = new Polygon(new Point(1 + Math.random(), 1 + Math.random()), 1, 4, Math.random())
         const centerDiff = polygon.center.minus(position)
 
         const newPolygon = polygon.scale(position, scale)
@@ -120,23 +120,36 @@ describe('Polygon', () => {
         expect(newPolygon.radius).toEqual(polygon.radius * scale)
         expect(newPolygon.center).toEqual(position.plus(centerDiff.multiply(scale)))
         expect(newPolygon.circleCount).toEqual(polygon.circleCount)
+        expect(newPolygon.startAngle).toBeCloseTo(polygon.startAngle)
     })
 
     it('can change radius', () => {
         const newRadius = Math.random()
-        const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4)
+        const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4, Math.random())
         const newPolygon = polygon.changeRadiusTo(newRadius)
         expect(newPolygon.radius).toEqual(newRadius)
         expect(newPolygon.center).toEqual(polygon.center)
         expect(newPolygon.circleCount).toEqual(polygon.circleCount)
+        expect(newPolygon.startAngle).toBeCloseTo(polygon.startAngle)
     })
 
     it('can be moved', () => {
         const newPosition = new Point(Math.random(), Math.random())
-        const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4)
+        const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4, Math.random())
         const newPolygon = polygon.moveTo(newPosition)
         expect(newPolygon.radius).toEqual(polygon.radius)
         expect(newPolygon.center).toBe(newPosition)
         expect(newPolygon.circleCount).toEqual(polygon.circleCount)
+        expect(newPolygon.startAngle).toBeCloseTo(polygon.startAngle)
+    })
+
+    it('can be rotated', () => {
+        const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4, Math.random())
+        const angle = Math.random()
+        const newPolygon = polygon.rotate(angle)
+        expect(newPolygon.radius).toEqual(polygon.radius)
+        expect(newPolygon.center).toBe(polygon.center)
+        expect(newPolygon.circleCount).toEqual(polygon.circleCount)
+        expect(newPolygon.startAngle).toBeCloseTo(polygon.startAngle + angle)
     })
 })

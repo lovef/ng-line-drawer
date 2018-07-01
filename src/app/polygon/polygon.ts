@@ -77,9 +77,13 @@ export class Polygon {
     circleCount: number
     angle: number
 
-    constructor(readonly center: Point, readonly radius: number, readonly pointsCount: number) {
+    constructor(
+        readonly center: Point,
+        readonly radius: number,
+        readonly pointsCount: number,
+        readonly startAngle = Math.PI / 2
+    ) {
         this.angle = 2 * Math.PI / pointsCount
-        const startAngle = Math.PI / 2
         this.points = Array.from({ length: pointsCount }, (value, key) => new Point(
             Math.cos(-key * this.angle + startAngle),
             Math.sin(-key * this.angle + startAngle))
@@ -109,14 +113,18 @@ export class Polygon {
     scale(position: Point, scale: number): Polygon {
         const centerDiff = this.center.minus(position)
         const newCenter = position.plus(centerDiff.multiply(scale))
-        return new Polygon(newCenter, this.radius * scale, this.pointsCount)
+        return new Polygon(newCenter, this.radius * scale, this.pointsCount, this.startAngle)
     }
 
     changeRadiusTo(newRadius: number): Polygon {
-        return new Polygon(this.center, newRadius, this.pointsCount)
+        return new Polygon(this.center, newRadius, this.pointsCount, this.startAngle)
     }
 
     moveTo(position: Point): Polygon {
-        return new Polygon(position, this.radius, this.pointsCount)
+        return new Polygon(position, this.radius, this.pointsCount, this.startAngle)
+    }
+
+    rotate(delta: number): Polygon {
+        return new Polygon(this.center, this.radius, this.pointsCount, this.startAngle + delta)
     }
 }

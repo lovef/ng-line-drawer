@@ -29,13 +29,20 @@ export class AppComponent implements OnInit {
 
     @HostListener('mousewheel', ['$event'])
     onMouseWheel(event: WheelEvent) {
-        if (event.wheelDeltaY > 0) {
-            this.polygonView.scale(new Point(event.x, event.y), 1.1)
-            this.draw()
-        } else if (event.wheelDeltaY < 0) {
-            this.polygonView.scale(new Point(event.x, event.y), 1 / 1.1)
-            this.draw()
+        if (event.shiftKey) {
+            if (event.wheelDeltaY > 0) {
+                this.polygonView.rotate(Math.PI / 180)
+            } else if (event.wheelDeltaY < 0) {
+                this.polygonView.rotate(-Math.PI / 180)
+            }
+        } else {
+            if (event.wheelDeltaY > 0) {
+                this.polygonView.scale(new Point(event.x, event.y), 1.1)
+            } else if (event.wheelDeltaY < 0) {
+                this.polygonView.scale(new Point(event.x, event.y), 1 / 1.1)
+            }
         }
+        this.draw()
     }
 
     @HostListener('mousedown', ['$event'])

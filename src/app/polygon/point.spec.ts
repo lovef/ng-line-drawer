@@ -32,5 +32,16 @@ describe('Point', () => {
         expect(Point.Y.angleFrom(Point.Y) / Math.PI).toEqual(0)
         expect(Point.Y.angleFrom(Point.Xminus) / Math.PI).toEqual(1.5)
         expect(Point.Y.angleFrom(Point.X) / Math.PI).toEqual(0.5)
+
+        expect(Point.X.angleFrom(Point.X)).toEqual(0)
+        expect(Point.Zero.angleFrom(Point.X)).toEqual(0)
+        expect(Point.X.angleFrom(Point.Zero)).toEqual(0)
+        const p = new Point(Math.random(), Math.random())
+        expect(p.angleFrom(new Point(p.x, p.y))).toEqual(0)
+        const almostP = new Point(
+            p.x + Math.random() * 0.00000001,
+            p.y + Math.random() * 0.00000001)
+        expect(Math.sin(p.angleFrom(almostP)))
+            .toBeCloseTo(0)
     })
 })

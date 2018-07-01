@@ -31,11 +31,24 @@ export class Point {
     }
 
     angleFrom(other: Point): number {
+        if (this.x === other.x && this.y === other.y || this.isZero() || other.isZero()) {
+            return 0
+        }
         const a = this.unit()
         const b = other.unit()
+        let dotProduct = a.dotProduct(b)
+        if (dotProduct > 1) {
+            dotProduct = 1
+        } else if (dotProduct < -1) {
+            dotProduct = -1
+        }
         return this.crossProduct(other) <= 0 ?
-            Math.acos(a.dotProduct(b)) :
-            2 * Math.PI - Math.acos(a.dotProduct(b))
+            Math.acos(dotProduct) :
+            2 * Math.PI - Math.acos(dotProduct)
+    }
+
+    isZero(): boolean {
+        return this.x === 0 && this.y === 0
     }
 
     private dotProduct(other: Point): number { return this.x * other.x + this.y * other.y }

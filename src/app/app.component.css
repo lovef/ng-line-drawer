@@ -1,3 +1,24 @@
 canvas {
     background-color: black;
 }
+
+#overlay {
+    position: fixed;
+    display: none;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    cursor: pointer;
+}
+
+textarea {
+    margin: 10px;
+    padding: 10px;
+    background-color:rgba(0, 0, 0, 0.9);
+    color:white;
+    border: none;
+    outline:none;
+    overflow-x: hidden;
+    transition:height 1s;
+    -webkit-transition:height 1s;
+}

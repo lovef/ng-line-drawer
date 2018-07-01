@@ -1,12 +1,27 @@
 import { Polygon } from './polygon'
 import { Point } from './point'
 
+export interface Configuration {
+    vertices: number
+    angle: number
+    radius: number
+    x: number
+    y: number
+}
+
 export class PolygonView {
 
     width: number
     height: number
 
-    polygon: Polygon
+    _polygon: Polygon
+    get polygon(): Polygon { return this._polygon }
+    set polygon(p: Polygon) {
+        this.configuration = null
+        this._polygon = p
+    }
+
+    private configuration: Configuration = null
 
     private oldPositionA: Point
     private oldPositionB: Point
@@ -14,8 +29,36 @@ export class PolygonView {
     constructor(width: number, height: number) {
         this.width = width
         this.height = height
-        this.polygon = new Polygon(new Point(width / 2, height), 1, 87)
+        this.polygon = new Polygon(new Point(width / 2, height), 1, 87, - Math.PI / 2)
         this.polygon = this.polygon.changeRadiusTo(height / this.polygon.calculateCircleRadius(7))
+    }
+
+    config(configuration: Configuration = null): Configuration {
+        if (configuration) {
+            this.polygon = new Polygon(
+                new Point(
+                    configuration.x * this.width / 100,
+                    configuration.y * this.height / 100),
+                configuration.radius,
+                configuration.vertices,
+                configuration.angle * Math.PI / 180)
+            this.configuration = configuration
+        }
+        return this.configuration || {
+            vertices: this.polygon.pointsCount,
+            angle: this.round(((this.polygon.startAngle * 180 / Math.PI) % 360 + 360) % 360),
+            radius: this.round(this.polygon.radius),
+            x: this.round(100 * this.polygon.center.x / this.width),
+            y: this.round(100 * this.polygon.center.y / this.height)
+        }
+    }
+
+    refreshConfig() {
+        this.configuration = null
+    }
+
+    private round(n: number): number {
+        return Math.round(n * 1000000) / 1000000
     }
 
     relativePosition(): Point {

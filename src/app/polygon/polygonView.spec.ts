@@ -1,4 +1,4 @@
-import { PolygonView } from './polygonView'
+import { PolygonView, Configuration } from './polygonView'
 import { Point } from './point'
 
 function radiusToMaxSideRatio(view: PolygonView): number {
@@ -125,5 +125,80 @@ describe('PolygonView', () => {
 
         view.touch(touchA, touchB)
         points(touchA, touchB).shouldBeCloseTo([view.polygon.points[3], view.polygon.points[15]])
+    })
+
+    it('exposes its configuration', () => {
+        const view = new PolygonView(Math.random(), Math.random())
+        const config = view.config()
+
+        expect(config.vertices).toEqual(view.polygon.pointsCount)
+        expect(config.angle).toBeCloseTo(view.polygon.startAngle * 180 / Math.PI + 360)
+        expect(config.radius).toBeCloseTo(view.polygon.radius)
+        expect(config.x).toBeCloseTo(100 * view.polygon.center.x / view.width)
+        expect(config.y).toBeCloseTo(100 * view.polygon.center.y / view.height)
+    })
+
+    it('configuration values are rounded to ppm', () => {
+        const view = new PolygonView(Math.random(), Math.random())
+        const config = view.config()
+        config.radius = 0.123456789
+        config.angle = 0.123456789
+        config.x = 0.123456789
+        config.y = 0.123456789
+        view.config(config)
+        view.polygon = view.polygon
+        expect(view.config().radius).toEqual(0.123457)
+        expect(view.config().angle).toEqual(0.123457)
+        expect(view.config().x).toEqual(0.123457)
+        expect(view.config().y).toEqual(0.123457)
+    })
+
+    it('entered config is returned as is', () => {
+        const view = new PolygonView(Math.random(), Math.random())
+        const config = view.config()
+        config.radius = 0.123456789
+        config.angle = 0.123456789
+        config.x = 0.123456789
+        config.y = 0.123456789
+        view.config(config)
+        expect(view.config()).toBe(config)
+        view.refreshConfig()
+        expect(view.config()).not.toBe(config)
+    })
+
+    it('configuration angle is between 0 and 360 degrees', () => {
+        const view = new PolygonView(Math.random(), Math.random())
+        const config = view.config()
+        config.angle = 7 * 360 + 123
+        view.config(config)
+        view.refreshConfig()
+        expect(view.config().angle).toEqual(123)
+        config.angle = - 7 * 360 + 123
+        view.config(config)
+        view.refreshConfig()
+        expect(view.config().angle).toEqual(123)
+    })
+
+    it('can be reconfigured', () => {
+        const view = new PolygonView(Math.random(), Math.random())
+        const original = view.polygon
+        view.config(null)
+        expect(view.polygon).toBe(original)
+        expect(view.polygon).toEqual(original)
+        const config: Configuration =  {
+            vertices: 3,
+            angle: Math.random(),
+            radius: Math.random(),
+            x: Math.random(),
+            y: Math.random()
+        }
+        view.config(config)
+
+        const newConfig = view.config()
+        expect(newConfig.vertices).toEqual(config.vertices)
+        expect(newConfig.angle).toBeCloseTo(config.angle)
+        expect(newConfig.radius).toBeCloseTo(config.radius)
+        expect(newConfig.x).toBeCloseTo(config.x)
+        expect(newConfig.y).toBeCloseTo(config.y)
     })
 })

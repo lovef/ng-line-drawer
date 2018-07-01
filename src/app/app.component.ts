@@ -12,46 +12,60 @@ export class AppComponent implements OnInit {
     polygonView: PolygonView
     lastMousePosition: Point
     mouseDown = false
+    timeout
 
     title = 'line-drawer'
+
+    get configuration() {
+        return JSON.stringify(this.polygonView.config(), null, 2)
+    }
+
+    set configuration(input) {
+        try {
+            this.polygonView.config(JSON.parse(input))
+            this.draw()
+        } catch (e) { }
+    }
+
     @ViewChild('canvas') canvas: ElementRef
+    @ViewChild('overlay') overlay: ElementRef
+    @ViewChild('config') config: ElementRef
 
     ngOnInit(): void {
         this.polygonView = new PolygonView(window.innerWidth, window.innerHeight)
-        this.draw()
+        this.update()
     }
 
-    @HostListener('touchstart', ['$event'])
     onTouchstart(event) {
         event.preventDefault()
+        this.showOverlay()
+        this.canvas.nativeElement.focus()
         this.polygonView.touch(new Point(event.touches[0].pageX, event.touches[0].pageY),
             event.touches[1] ? new Point(event.touches[1].pageX, event.touches[1].pageY) : null)
     }
 
-    @HostListener('touchmove', ['$event'])
     onTouchmove(event) {
         event.preventDefault()
         this.polygonView.touch(new Point(event.touches[0].pageX, event.touches[0].pageY),
             event.touches[1] ? new Point(event.touches[1].pageX, event.touches[1].pageY) : null)
-        this.draw()
+        this.update()
     }
 
-    @HostListener('touchend', ['$event'])
-    @HostListener('touchcancel', ['$event'])
     onTouchcancel(event) {
         event.preventDefault()
         this.polygonView.stopTouch()
+        this.hideOverlayCountdown()
     }
 
     @HostListener('window:resize', ['$event'])
     onResize(event) {
         this.polygonView.resize(window.innerWidth, window.innerHeight)
-        this.draw()
+        this.update()
     }
 
-    @HostListener('mousewheel', ['$event'])
     onMouseWheel(event: WheelEvent) {
         event.preventDefault()
+        this.showOverlay()
         if (event.shiftKey) {
             if (event.wheelDeltaY > 0) {
                 this.polygonView.rotate(Math.PI / 180)
@@ -65,23 +79,23 @@ export class AppComponent implements OnInit {
                 this.polygonView.scale(new Point(event.x, event.y), 1 / 1.1)
             }
         }
-        this.draw()
+        this.hideOverlayCountdown()
+        this.update()
     }
 
-    @HostListener('mousedown', ['$event'])
     onMouseDown(event: MouseEvent) {
         this.lastMousePosition = new Point(event.x, event.y)
         this.mouseDown = true
+        this.showOverlay()
     }
 
-    @HostListener('mouseup', ['$event'])
     onMouseUp(event: MouseEvent) {
         this.mouseDown = false
+        this.hideOverlayCountdown()
     }
 
-    @HostListener('mousemove', ['$event'])
     onMousemove(event: MouseEvent) {
-        if (this.mouseDown) {
+        if (event.buttons) {
             const position = new Point(event.x, event.y)
             if (event.shiftKey) {
                 this.polygonView.rotateBetween(this.lastMousePosition, position)
@@ -89,8 +103,26 @@ export class AppComponent implements OnInit {
                 this.polygonView.move(position.minus(this.lastMousePosition))
             }
             this.lastMousePosition = position
-            this.draw()
+            this.update()
         }
+    }
+
+    showOverlay() {
+        clearTimeout(this.timeout)
+        this.overlay.nativeElement.style.display = 'block'
+    }
+
+    hideOverlayCountdown() {
+        this.polygonView.refreshConfig()
+        this.timeout = setTimeout(() => {
+            this.overlay.nativeElement.style.display = 'none'
+        }, 2000)
+    }
+
+    update() {
+        this.draw()
+        this.configuration = JSON.stringify(this.polygonView.config(), null, 2)
+        this.config.nativeElement.rows = this.configuration.split(/\r\n|\r|\n/).length
     }
 
     draw() {

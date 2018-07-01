@@ -60,7 +60,11 @@ export class AppComponent implements OnInit {
     onMousemove(event: MouseEvent) {
         if (this.mouseDown) {
             const position = new Point(event.x, event.y)
-            this.polygonView.move(position.minus(this.lastMousePosition))
+            if (event.shiftKey) {
+                this.polygonView.rotateBetween(this.lastMousePosition, position)
+            } else {
+                this.polygonView.move(position.minus(this.lastMousePosition))
+            }
             this.lastMousePosition = position
             this.draw()
         }

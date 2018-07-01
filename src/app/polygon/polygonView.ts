@@ -40,4 +40,10 @@ export class PolygonView {
     rotate(delta: number) {
         this.polygon = this.polygon.rotate(delta)
     }
+
+    rotateBetween(from: Point, to: Point) {
+        const a = from.minus(this.polygon.center)
+        const b = to.minus(this.polygon.center)
+        this.polygon = this.polygon.rotate(b.angleFrom(a))
+    }
 }

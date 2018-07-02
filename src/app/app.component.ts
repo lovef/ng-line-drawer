@@ -21,14 +21,21 @@ export class AppComponent implements OnInit {
         this.draw()
     }
 
+    // @HostListener('canvas:touch:gesture', ['$event'])
+    onGesture(event) {
+        console.log(event)
+    }
+
     @HostListener('window:resize', ['$event'])
     onResize(event) {
+        console.log('resize', event)
         this.polygonView.resize(window.innerWidth, window.innerHeight)
         this.draw()
     }
 
     @HostListener('mousewheel', ['$event'])
     onMouseWheel(event: WheelEvent) {
+        console.log('mousewheel', event)
         if (event.shiftKey) {
             if (event.wheelDeltaY > 0) {
                 this.polygonView.rotate(Math.PI / 180)
@@ -47,17 +54,20 @@ export class AppComponent implements OnInit {
 
     @HostListener('mousedown', ['$event'])
     onMouseDown(event: MouseEvent) {
+        console.log('mousedown', event)
         this.lastMousePosition = new Point(event.x, event.y)
         this.mouseDown = true
     }
 
     @HostListener('mouseup', ['$event'])
     onMouseUp(event: MouseEvent) {
+        console.log('mouseup', event)
         this.mouseDown = false
     }
 
     @HostListener('mousemove', ['$event'])
     onMousemove(event: MouseEvent) {
+        console.log('mousemove', event)
         if (this.mouseDown) {
             const position = new Point(event.x, event.y)
             if (event.shiftKey) {
@@ -68,6 +78,11 @@ export class AppComponent implements OnInit {
             this.lastMousePosition = position
             this.draw()
         }
+    }
+// https://stackoverflow.com/questions/14928485/how-to-handle-multiple-touch-events-on-a-single-html-element-using-angular-direc
+    @HostListener('touchmove', ['$event'])
+    onTouchmove(event) {
+        console.log('touchmove', event)
     }
 
     draw() {

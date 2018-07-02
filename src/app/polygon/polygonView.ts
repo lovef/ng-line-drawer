@@ -8,6 +8,9 @@ export class PolygonView {
 
     polygon: Polygon
 
+    private oldPositionA: Point
+    private oldPositionB: Point
+
     constructor(width: number, height: number) {
         this.width = width
         this.height = height
@@ -34,7 +37,7 @@ export class PolygonView {
     }
 
     move(delta: Point) {
-        this.polygon = this.polygon.moveTo(this.polygon.center.plus(delta))
+        this.polygon = this.polygon.move(delta)
     }
 
     rotate(delta: number) {
@@ -45,5 +48,41 @@ export class PolygonView {
         const a = from.minus(this.polygon.center)
         const b = to.minus(this.polygon.center)
         this.polygon = this.polygon.rotate(b.angleFrom(a))
+    }
+
+    touch(positionA: Point, positionB: Point = null) {
+        if (positionA && this.oldPositionA && positionB && this.oldPositionB) {
+            this.moveWithTouch(
+                this.oldPositionA, positionA,
+                this.oldPositionB, positionB)
+
+        } else if (positionA && this.oldPositionA) {
+            const move = positionA.minus(this.oldPositionA)
+            this.polygon = this.polygon.move(move)
+        }
+
+        this.oldPositionA = positionA
+        this.oldPositionB = positionB
+    }
+
+    stopTouch() {
+        this.oldPositionA = null
+        this.oldPositionB = null
+    }
+
+    private moveWithTouch(
+        A0: Point, A: Point,
+        B0: Point, B: Point
+    ) {
+        const C0 = this.polygon.center
+        const AB = B.minus(A)
+        const A0B0 = B0.minus(A0)
+        const angle = AB.angleFrom(A0B0)
+        const scale = AB.length() / A0B0.length()
+        const C = C0.minus(A0).rotate(angle).multiply(scale).plus(A)
+        this.polygon = new Polygon(C,
+            this.polygon.radius * scale,
+            this.polygon.pointsCount,
+            this.polygon.startAngle + angle)
     }
 }

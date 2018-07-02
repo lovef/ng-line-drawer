@@ -133,12 +133,24 @@ describe('Polygon', () => {
         expect(newPolygon.startAngle).toBeCloseTo(polygon.startAngle)
     })
 
-    it('can be moved', () => {
+    it('can be moved to an absolute position', () => {
         const newPosition = new Point(Math.random(), Math.random())
         const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4, Math.random())
         const newPolygon = polygon.moveTo(newPosition)
         expect(newPolygon.radius).toEqual(polygon.radius)
         expect(newPolygon.center).toBe(newPosition)
+        expect(newPolygon.circleCount).toEqual(polygon.circleCount)
+        expect(newPolygon.startAngle).toBeCloseTo(polygon.startAngle)
+    })
+
+    it('can be moved', () => {
+        const delta = new Point(Math.random(), Math.random())
+        const polygon = new Polygon(new Point(Math.random(), Math.random()), 1, 4, Math.random())
+        const newPolygon = polygon.move(delta)
+        expect(newPolygon.radius).toEqual(polygon.radius)
+        const expectedPosition = polygon.center.plus(delta)
+        expect(newPolygon.center.x).toBeCloseTo(expectedPosition.x)
+        expect(newPolygon.center.y).toBeCloseTo(expectedPosition.y)
         expect(newPolygon.circleCount).toEqual(polygon.circleCount)
         expect(newPolygon.startAngle).toBeCloseTo(polygon.startAngle)
     })

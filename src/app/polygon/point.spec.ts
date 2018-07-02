@@ -1,5 +1,54 @@
 import { Point } from './point'
 
+function fail(message: String, actual, expected) {
+    throw new Error(message + '\n' +
+        'Expected: ' + expected + '\n' +
+        'Actual:   ' + actual)
+}
+
+function matches(a: Point, b: Point) {
+    const threshhold = 0.000001
+    return Math.abs(a.x - b.x) < threshhold && Math.abs(a.y - b.y) < threshhold
+}
+
+class PointMatcher {
+    constructor(readonly a: Point) { }
+
+    shouldBeCloseTo(b: Point) {
+        if (!matches(this.a, b)) {
+            fail('Points should match', this.a, b)
+        }
+    }
+}
+
+function point(a: Point): PointMatcher {
+    return new PointMatcher(a)
+}
+
+class PointsMatcher {
+
+    constructor(readonly expectedPoints: Point[]) { }
+
+    shouldBeCloseTo(...actualPoints: Point[]) {
+        if (actualPoints.length !== this.expectedPoints.length) {
+            fail('Point arrays lengths missmatch', actualPoints, this.expectedPoints)
+        }
+        for (let i = 0; i < actualPoints.length; i++) {
+            if (!matches(actualPoints[i], this.expectedPoints[i])) {
+                fail('Point arrays differ at index ' + i, actualPoints, this.expectedPoints)
+            }
+        }
+    }
+
+    map(callbackfn: (value: Point, index: number, array: Point[]) => Point, thisArg?: any): PointsMatcher {
+        return new PointsMatcher(this.expectedPoints.map(callbackfn))
+    }
+}
+
+function points(...expectedPoints: Point[]) {
+    return new PointsMatcher(expectedPoints)
+}
+
 describe('Point', () => {
     it('(a, b) + (c, d) = (a + c, b + d)', () => {
         expect(new Point(1, 2).plus(new Point(3, 4))).toEqual(new Point(4, 6))
@@ -43,5 +92,19 @@ describe('Point', () => {
             p.y + Math.random() * 0.00000001)
         expect(Math.sin(p.angleFrom(almostP)))
             .toBeCloseTo(0)
+    })
+
+    it('can be rotated', () => {
+        points(Point.X.rotate(0.0 * Math.PI)).shouldBeCloseTo(Point.X)
+        points(Point.X.rotate(0.5 * Math.PI)).shouldBeCloseTo(Point.Y)
+        points(Point.X.rotate(1.0 * Math.PI)).shouldBeCloseTo(Point.Xminus)
+        points(Point.X.rotate(1.5 * Math.PI)).shouldBeCloseTo(Point.Yminus)
+        points(Point.X.rotate(2.0 * Math.PI)).shouldBeCloseTo(Point.X)
+
+        points(Point.Y.rotate(0.0 * Math.PI)).shouldBeCloseTo(Point.Y)
+        points(Point.Y.rotate(0.5 * Math.PI)).shouldBeCloseTo(Point.Xminus)
+        points(Point.Y.rotate(1.0 * Math.PI)).shouldBeCloseTo(Point.Yminus)
+        points(Point.Y.rotate(1.5 * Math.PI)).shouldBeCloseTo(Point.X)
+        points(Point.Y.rotate(2.0 * Math.PI)).shouldBeCloseTo(Point.Y)
     })
 })

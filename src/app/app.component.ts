@@ -21,6 +21,28 @@ export class AppComponent implements OnInit {
         this.draw()
     }
 
+    @HostListener('touchstart', ['$event'])
+    onTouchstart(event) {
+        event.preventDefault()
+        this.polygonView.touch(new Point(event.touches[0].pageX, event.touches[0].pageY),
+            event.touches[1] ? new Point(event.touches[1].pageX, event.touches[1].pageY) : null)
+    }
+
+    @HostListener('touchmove', ['$event'])
+    onTouchmove(event) {
+        event.preventDefault()
+        this.polygonView.touch(new Point(event.touches[0].pageX, event.touches[0].pageY),
+            event.touches[1] ? new Point(event.touches[1].pageX, event.touches[1].pageY) : null)
+        this.draw()
+    }
+
+    @HostListener('touchend', ['$event'])
+    @HostListener('touchcancel', ['$event'])
+    onTouchcancel(event) {
+        event.preventDefault()
+        this.polygonView.stopTouch()
+    }
+
     @HostListener('window:resize', ['$event'])
     onResize(event) {
         this.polygonView.resize(window.innerWidth, window.innerHeight)

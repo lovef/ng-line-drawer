@@ -29,6 +29,7 @@ export class AppComponent implements OnInit {
 
     @HostListener('mousewheel', ['$event'])
     onMouseWheel(event: WheelEvent) {
+        event.preventDefault()
         if (event.shiftKey) {
             if (event.wheelDeltaY > 0) {
                 this.polygonView.rotate(Math.PI / 180)

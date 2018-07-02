@@ -124,6 +124,10 @@ export class Polygon {
         return new Polygon(position, this.radius, this.pointsCount, this.startAngle)
     }
 
+    move(delta: Point): Polygon {
+        return new Polygon(this.center.plus(delta), this.radius, this.pointsCount, this.startAngle)
+    }
+
     rotate(delta: number): Polygon {
         return new Polygon(this.center, this.radius, this.pointsCount, this.startAngle + delta)
     }

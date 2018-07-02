@@ -47,6 +47,12 @@ export class Point {
             2 * Math.PI - Math.acos(dotProduct)
     }
 
+    rotate(angle: number): Point {
+        return new Point(
+            this.x * Math.cos(angle) - this.y * Math.sin(angle),
+            this.x * Math.sin(angle) + this.y * Math.cos(angle))
+    }
+
     isZero(): boolean {
         return this.x === 0 && this.y === 0
     }

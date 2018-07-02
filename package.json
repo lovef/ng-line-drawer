@@ -4,10 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --prod",
     "test": "ng test --browsers ChromeHeadless --watch=false",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "serve": "npm run build && firebase serve",
+    "deploy": "npm run test && npm run build && firebase deploy"
   },
   "private": true,
   "dependencies": {

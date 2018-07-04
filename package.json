@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --host 0.0.0.0",
     "build": "ng build --prod",
     "test": "ng test --browsers ChromeHeadless --watch=false",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "serve": "npm run build && firebase serve",
+    "serve": "npm run build && firebase serve --host 0.0.0.0",
     "deploy": "npm run test && npm run build && firebase deploy"
   },
   "private": true,

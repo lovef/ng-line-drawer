@@ -94,6 +94,14 @@ export class PolygonView {
     }
 
     touch(positionA: Point, positionB: Point = null) {
+        if (this.oldPositionA && this.oldPositionB) {
+            if (positionA.lengthSquaredTo(this.oldPositionA) > positionA.lengthSquaredTo(this.oldPositionB)) {
+                const tmp = this.oldPositionA
+                this.oldPositionA = this.oldPositionB
+                this.oldPositionB = tmp
+            }
+        }
+
         if (positionA && this.oldPositionA && positionB && this.oldPositionB) {
             this.moveWithTouch(
                 this.oldPositionA, positionA,

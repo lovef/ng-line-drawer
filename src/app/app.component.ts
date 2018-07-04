@@ -52,12 +52,11 @@ export class AppComponent implements OnInit {
     }
 
     onTouchcancel(event) {
-        if (event.touches.length > 0) {
-            return
-        }
         event.preventDefault()
         this.polygonView.stopTouch()
-        this.hideOverlayCountdown()
+        if (event.touches.length > 0) {
+            this.hideOverlayCountdown()
+        }
     }
 
     @HostListener('window:resize', ['$event'])

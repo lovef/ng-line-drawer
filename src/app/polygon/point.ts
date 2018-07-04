@@ -26,6 +26,16 @@ export class Point {
         return Math.sqrt(this.x * this.x + this.y * this.y)
     }
 
+    lengthTo(other: Point): number {
+        return Math.sqrt(this.lengthSquaredTo(other))
+    }
+
+    lengthSquaredTo(other: Point): number {
+        const x = this.x - other.x
+        const y = this.y - other.y
+        return x * x + y * y
+    }
+
     angle(): number {
         return this.angleFrom(Point.X)
     }

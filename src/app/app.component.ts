@@ -52,6 +52,9 @@ export class AppComponent implements OnInit {
     }
 
     onTouchcancel(event) {
+        if (event.touches.length > 0) {
+            return
+        }
         event.preventDefault()
         this.polygonView.stopTouch()
         this.hideOverlayCountdown()

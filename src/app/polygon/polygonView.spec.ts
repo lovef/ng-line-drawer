@@ -113,15 +113,15 @@ describe('PolygonView', () => {
     })
 
     it('can be panned, rotated and scrolled with two finger touch', () => {
-        const view = new PolygonView(Math.random(), Math.random())
+        const view = new PolygonView(1000, 1000)
         const originalPolygon = view.polygon
         const originalTouchA = originalPolygon.points[3]
         const originalTouchB = originalPolygon.points[15]
         view.touch(originalTouchA, originalTouchB)
         expect(view.polygon).toEqual(originalPolygon)
 
-        const touchA = new Point(Math.random(), Math.random())
-        const touchB = new Point(Math.random(), Math.random())
+        const touchA = originalTouchA.plus(new Point(Math.random(), Math.random()))
+        const touchB = originalTouchB.plus(new Point(Math.random(), Math.random()))
 
         view.touch(touchA, touchB)
         points(touchA, touchB).shouldBeCloseTo([view.polygon.points[3], view.polygon.points[15]])
@@ -200,5 +200,21 @@ describe('PolygonView', () => {
         expect(newConfig.radius).toBeCloseTo(config.radius)
         expect(newConfig.x).toBeCloseTo(config.x)
         expect(newConfig.y).toBeCloseTo(config.y)
+    })
+
+    it('image does not jump when removing or adding a finger', () => {
+        const view = new PolygonView(1, 1)
+        const original = view.polygon
+        view.touch(new Point(-1, 0), new Point(1, 0))
+        view.touch(new Point(-1, 0))
+        expect(view.polygon.center).toEqual(original.center)
+        expect(view.polygon.startAngle).toEqual(original.startAngle)
+        view.touch(new Point(-1, 0), new Point(1, 0))
+        view.touch(new Point(1, 0))
+        expect(view.polygon.center).toEqual(original.center)
+        expect(view.polygon.startAngle).toEqual(original.startAngle)
+        view.touch(new Point(1, 0), new Point(-1, 0))
+        expect(view.polygon.center).toEqual(original.center)
+        expect(view.polygon.startAngle).toEqual(original.startAngle)
     })
 })

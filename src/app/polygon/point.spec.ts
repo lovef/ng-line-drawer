@@ -66,6 +66,14 @@ describe('Point', () => {
         expect(new Point(3, 4).length()).toEqual(5)
     })
 
+    it('can calculate length to another point', () => {
+        expect(Point.Zero.lengthTo(new Point(3, 4))).toEqual(5)
+    })
+
+    it('can calculate length squared to another point', () => {
+        expect(Point.Zero.lengthSquaredTo(new Point(3, 4))).toEqual(25)
+    })
+
     it('can calculate the angle', () => {
         expect(Point.X.angle() / Math.PI).toEqual(0)
         expect(Point.Y.angle() / Math.PI).toBeCloseTo(0.5)

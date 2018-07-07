@@ -1,4 +1,4 @@
-import { Polygon } from './polygon'
+import { Polygon, Circle, CircleIterator } from './polygon'
 import { Point } from './point'
 
 export interface ConfigurationModel {
@@ -8,11 +8,57 @@ export interface ConfigurationModel {
 }
 
 export interface Configuration {
-    vertices: number
+    vertices: number,
+    startCircle: number,
+    circleCount: number,
+    colors: string[],
     angle: number
     radius: number
     x: number
     y: number
+}
+
+class CircleViewConfig {
+    constructor(
+        readonly circle: Circle,
+        readonly color: string
+    ) { }
+}
+
+class CircleViewIterator implements Iterator<CircleViewConfig> {
+
+    index = 0
+    current: number
+    circleIterator: CircleIterator
+
+    constructor(readonly polygon: PolygonView, readonly start, readonly end) {
+        this.current = start
+        this.circleIterator = polygon.polygon.getCircleIterable(start, end).iterator()
+    }
+
+    next(): IteratorResult<CircleViewConfig> {
+        const next = this.circleIterator.next()
+        if (!next.value) {
+            return { done: true, value: undefined }
+        }
+        const circleViewConfig = new CircleViewConfig(
+            next.value,
+            this.polygon.colors[this.index % this.polygon.colors.length])
+        this.index++
+        return {
+            done: false,
+            value: circleViewConfig
+        }
+    }
+}
+
+class CircleViewIterable implements Iterable<CircleViewConfig> {
+
+    constructor(readonly polygonView: PolygonView, readonly start: number, readonly end: number) { }
+
+    [Symbol.iterator](): Iterator<CircleViewConfig> {
+        return new CircleViewIterator(this.polygonView, this.start, this.end)
+    }
 }
 
 export class PolygonView {
@@ -27,6 +73,18 @@ export class PolygonView {
         this._polygon = p
     }
 
+    colors = [
+        '#FF0000',
+        '#FF8000',
+        '#FFFF00',
+        '#008000',
+        '#0000FF',
+        '#A000C0'
+    ].reverse()
+
+    startCircle = 0
+    circleCount = this.colors.length
+
     private configuration: Configuration = null
 
     private oldPositionA: Point
@@ -39,6 +97,10 @@ export class PolygonView {
         this.polygon = this.polygon.changeRadiusTo(height / this.polygon.calculateCircleRadius(7))
     }
 
+    getCircleViewIterable(): CircleViewIterable {
+        return new CircleViewIterable(this, this.startCircle, this.startCircle + this.circleCount - 1)
+    }
+
     config(configuration: Configuration = null): Configuration {
         if (configuration) {
             this.polygon = new Polygon(
@@ -48,10 +110,16 @@ export class PolygonView {
                 configuration.radius * Math.max(this.width, this.height) / 100,
                 configuration.vertices,
                 configuration.angle * Math.PI / 180)
+            this.startCircle = configuration.startCircle
+            this.circleCount = configuration.circleCount
+            this.colors = configuration.colors.slice().reverse()
             this.configuration = configuration
         }
         return this.configuration || {
             vertices: this.polygon.pointsCount,
+            startCircle: this.startCircle,
+            circleCount: this.circleCount,
+            colors: this.colors.slice().reverse(),
             angle: this.round(((this.polygon.startAngle * 180 / Math.PI) % 360 + 360) % 360),
             radius: this.round(100 * this.polygon.radius / Math.max(this.width, this.height)),
             x: this.round(100 * this.polygon.center.x / this.width),

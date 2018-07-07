@@ -167,28 +167,13 @@ export class AppComponent implements OnInit {
         ctx.canvas.width = window.innerWidth
         ctx.canvas.height = window.innerHeight
 
-        ctx.strokeStyle = '#FFF'
-        const colors = [
-            '#FF0000',
-            '#FF8000',
-            '#FFFF00',
-            '#008000',
-            '#0000FF',
-            '#A000C0'
-        ].reverse()
-
-        let i = 0
-        ctx.lineWidth = 1.3
-        for (const circle of this.polygonView.polygon.getCircleIterable()) {
-            ctx.strokeStyle = colors[i++]
-            for (const line of circle) {
+        for (const circle of this.polygonView.getCircleViewIterable()) {
+            ctx.strokeStyle = circle.color
+            for (const line of circle.circle) {
                 ctx.beginPath()
                 ctx.moveTo(line.start.x, line.start.y)
                 ctx.lineTo(line.end.x, line.end.y)
                 ctx.stroke()
-            }
-            if (i >= colors.length) {
-                break
             }
         }
     }

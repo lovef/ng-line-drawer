@@ -132,6 +132,9 @@ describe('PolygonView', () => {
         const config = view.config()
 
         expect(config.vertices).toEqual(view.polygon.pointsCount)
+        expect(config.startCircle).toEqual(0)
+        expect(config.circleCount).toEqual(6)
+        expect(config.colors).toEqual(view.colors.reverse())
         expect(config.angle).toBeCloseTo(view.polygon.startAngle * 180 / Math.PI + 360)
         expect(config.radius).toBeCloseTo(100 * view.polygon.radius / Math.max(view.width, view.height))
         expect(config.x).toBeCloseTo(100 * view.polygon.center.x / view.width)
@@ -156,8 +159,11 @@ describe('PolygonView', () => {
     it('entered config is returned as is', () => {
         const view = new PolygonView(Math.random(), Math.random())
         const config = view.config()
-        config.radius = 0.123456789
+        config.vertices = 11
+        config.startCircle = 12
+        config.circleCount = 13
         config.angle = 0.123456789
+        config.radius = 0.123456789
         config.x = 0.123456789
         config.y = 0.123456789
         view.config(config)
@@ -213,17 +219,25 @@ describe('PolygonView', () => {
         view.config(null)
         expect(view.polygon).toBe(original)
         expect(view.polygon).toEqual(original)
-        const config: Configuration =  {
-            vertices: 3,
+        const config: Configuration = {
+            vertices: 11,
+            startCircle: 12,
+            circleCount: 13,
+            colors: ['a', 'b', 'c'],
             angle: Math.random(),
             radius: Math.random(),
             x: Math.random(),
             y: Math.random()
         }
         view.config(config)
-
+        expect(config.colors).toEqual(['a', 'b', 'c'])
+        view.polygon = view.polygon
         const newConfig = view.config()
         expect(newConfig.vertices).toEqual(config.vertices)
+        expect(newConfig.startCircle).toEqual(config.startCircle)
+        expect(newConfig.circleCount).toEqual(config.circleCount)
+        expect(newConfig.colors).toEqual(config.colors)
+        expect(config.colors).toEqual(['a', 'b', 'c'])
         expect(newConfig.angle).toBeCloseTo(config.angle)
         expect(newConfig.radius).toBeCloseTo(config.radius)
         expect(newConfig.x).toBeCloseTo(config.x)
@@ -244,5 +258,27 @@ describe('PolygonView', () => {
         view.touch(new Point(1, 0), new Point(-1, 0))
         expect(view.polygon.center).toEqual(original.center)
         expect(view.polygon.startAngle).toEqual(original.startAngle)
+    })
+
+    it('can iterate circles to paint', () => {
+        const view = new PolygonView(1, 1)
+
+        const circleViews = Array.from(view.getCircleViewIterable())
+        expect(circleViews.length).toEqual(6)
+        expect(circleViews.map((a) => a.color)).toEqual(view.colors)
+        expect(circleViews.map((a) => a.color)).toEqual(view.config().colors.reverse())
+    })
+
+    it('can configer levels to render', () => {
+        const view = new PolygonView(1, 1)
+
+        const config = view.config()
+        config.startCircle = 10
+        config.circleCount = view.colors.length * 2
+        view.config(config)
+
+        const circleViews = Array.from(view.getCircleViewIterable())
+        expect(circleViews.map((a) => a.circle.circleIndex)).toEqual([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21])
+        expect(circleViews.map((a) => a.color)).toEqual(view.colors.concat(view.colors))
     })
 })

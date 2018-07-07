@@ -32,7 +32,7 @@ class CirclePointIterator implements Iterator<Line> {
     }
 }
 
-class Circle implements Iterable<Line> {
+export class Circle implements Iterable<Line> {
 
     constructor(readonly polygon: Polygon, readonly circleIndex) { }
 
@@ -41,7 +41,7 @@ class Circle implements Iterable<Line> {
     }
 }
 
-class CircleIterator implements Iterator<Circle> {
+export class CircleIterator implements Iterator<Circle> {
 
     current: number
 
@@ -67,6 +67,10 @@ class CircleIterable implements Iterable<Circle> {
     constructor(readonly polygon: Polygon, readonly start: number, readonly end: number) { }
 
     [Symbol.iterator](): Iterator<Circle> {
+        return this.iterator()
+    }
+
+    iterator(): CircleIterator {
         return new CircleIterator(this.polygon, this.start, this.end)
     }
 }
@@ -99,8 +103,11 @@ export class Polygon {
         return new Circle(this, circleIndex)
     }
 
-    getCircleIterable(start = 0, end?: number): CircleIterable {
-        return new CircleIterable(this, start, end || this.circleCount - 1)
+    getCircleIterable(start = 0, end: number = null): CircleIterable {
+        if (end === null || end - start > this.circleCount) {
+            end = start + this.circleCount - 1
+        }
+        return new CircleIterable(this, start, end)
     }
 
     calculateCircleRadius(circleIndex: number): number {

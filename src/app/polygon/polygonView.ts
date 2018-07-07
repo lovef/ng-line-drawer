@@ -1,6 +1,12 @@
 import { Polygon } from './polygon'
 import { Point } from './point'
 
+export interface ConfigurationModel {
+    config: string,
+    selectionStart: number
+    selectionEnd: number
+}
+
 export interface Configuration {
     vertices: number
     angle: number
@@ -39,7 +45,7 @@ export class PolygonView {
                 new Point(
                     configuration.x * this.width / 100,
                     configuration.y * this.height / 100),
-                configuration.radius,
+                configuration.radius * Math.max(this.width, this.height) / 100,
                 configuration.vertices,
                 configuration.angle * Math.PI / 180)
             this.configuration = configuration
@@ -47,9 +53,30 @@ export class PolygonView {
         return this.configuration || {
             vertices: this.polygon.pointsCount,
             angle: this.round(((this.polygon.startAngle * 180 / Math.PI) % 360 + 360) % 360),
-            radius: this.round(this.polygon.radius),
+            radius: this.round(100 * this.polygon.radius / Math.max(this.width, this.height)),
             x: this.round(100 * this.polygon.center.x / this.width),
             y: this.round(100 * this.polygon.center.y / this.height)
+        }
+    }
+
+    manipulateJson(json: String, selectionStart: number, direction: number): ConfigurationModel {
+        let endIndex = json.indexOf(',', selectionStart) || json.length - 1
+        if (endIndex < 0) {
+            endIndex = json.length - 1
+        }
+        let startIndex = json.substring(0, endIndex).lastIndexOf(',')
+        if (startIndex < 0) {
+            startIndex = 0
+        }
+        const jsonLine = json.substring(startIndex, endIndex).trim()
+        const propertyMatch = /("[^"]+":\s*)([^,]+)/.exec(jsonLine)
+        const delta = direction > 0 ? 1 : -1
+        const newProperty = propertyMatch[1] + this.round(Number(propertyMatch[2]) + delta)
+        const updatedJson = json.replace(propertyMatch[0], newProperty)
+        return {
+            config: updatedJson,
+            selectionStart: startIndex + propertyMatch.index + propertyMatch[1].length,
+            selectionEnd: startIndex + propertyMatch.index + newProperty.length
         }
     }
 

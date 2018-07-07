@@ -13,6 +13,7 @@ export class AppComponent implements OnInit {
     lastMousePosition: Point
     mouseDown = false
     timeout
+    configFocused = false
 
     title = 'line-drawer'
 
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit {
     set configuration(input) {
         try {
             this.polygonView.config(JSON.parse(input))
+            this.config.nativeElement.value = this.configuration
             this.draw()
         } catch (e) { }
     }
@@ -54,7 +56,7 @@ export class AppComponent implements OnInit {
     onTouchcancel(event) {
         event.preventDefault()
         this.polygonView.stopTouch()
-        if (event.touches.length > 0) {
+        if (event.touches.length === 0) {
             this.hideOverlayCountdown()
         }
     }
@@ -67,6 +69,11 @@ export class AppComponent implements OnInit {
 
     onMouseWheel(event: WheelEvent) {
         event.preventDefault()
+        if (this.configFocused) {
+            this.onConfigMouseWheel(event)
+            return
+        }
+
         this.showOverlay()
         if (event.shiftKey) {
             if (event.wheelDeltaY > 0) {
@@ -83,6 +90,22 @@ export class AppComponent implements OnInit {
         }
         this.hideOverlayCountdown()
         this.update()
+    }
+
+    onConfigMouseWheel(event: WheelEvent) {
+        event.preventDefault()
+        this.showOverlay()
+
+        try {
+            const textArea: HTMLTextAreaElement = this.config.nativeElement
+            const json = textArea.value
+            const result = this.polygonView.manipulateJson(json, textArea.selectionStart, event.wheelDeltaY)
+            this.configuration = result.config
+            textArea.selectionStart = result.selectionStart
+            textArea.selectionEnd = result.selectionEnd
+
+            this.update()
+        } catch (e) { }
     }
 
     onMouseDown(event: MouseEvent) {
@@ -107,6 +130,16 @@ export class AppComponent implements OnInit {
             this.lastMousePosition = position
             this.update()
         }
+    }
+
+    focusConfig(event) {
+        this.configFocused = true
+        this.showOverlay()
+    }
+
+    blurConfig() {
+        this.configFocused = false
+        this.hideOverlayCountdown()
     }
 
     showOverlay() {

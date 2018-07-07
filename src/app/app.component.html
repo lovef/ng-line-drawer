@@ -1,6 +1,8 @@
 <div #overlay id="overlay">
     <textarea #config tabindex="0" cols="30"
-        [(ngModel)]="configuration" (focus)="showOverlay()" ng-blur="hideOverlayCountdown()">
+        [(ngModel)]="configuration"
+        (focus)="focusConfig($event)" (blur)="blurConfig()"
+        (mousewheel)="onMouseWheel($event)">
     </textarea>
 </div>
 <canvas #canvas

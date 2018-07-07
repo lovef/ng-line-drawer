@@ -133,7 +133,7 @@ describe('PolygonView', () => {
 
         expect(config.vertices).toEqual(view.polygon.pointsCount)
         expect(config.angle).toBeCloseTo(view.polygon.startAngle * 180 / Math.PI + 360)
-        expect(config.radius).toBeCloseTo(view.polygon.radius)
+        expect(config.radius).toBeCloseTo(100 * view.polygon.radius / Math.max(view.width, view.height))
         expect(config.x).toBeCloseTo(100 * view.polygon.center.x / view.width)
         expect(config.y).toBeCloseTo(100 * view.polygon.center.y / view.height)
     })
@@ -177,6 +177,34 @@ describe('PolygonView', () => {
         view.config(config)
         view.refreshConfig()
         expect(view.config().angle).toEqual(123)
+    })
+
+    it('change configuration JSON value at position', () => {
+        const view = new PolygonView(Math.random(), Math.random())
+        const json = '{"abc": 123, "changeMe": 456.123, "def": 789}'
+        let result = view.manipulateJson(json, json.indexOf('abc'), -Math.random())
+        expect(result.config).toEqual(json.replace('123', '122'))
+        expect(result.selectionStart).toEqual(result.config.indexOf('122'))
+        expect(result.selectionEnd).toEqual(result.selectionStart + 3)
+
+        result = view.manipulateJson(json, json.indexOf('changeMe'), Math.random())
+        expect(result.config).toEqual(json.replace('456.123', '457.123'))
+        expect(result.selectionStart).toEqual(result.config.indexOf('457.123'))
+        expect(result.selectionEnd).toEqual(result.selectionStart + 7)
+
+        result = view.manipulateJson(json, json.indexOf('def'), Math.random())
+        expect(result.config).toEqual(json.replace('789', '790'))
+        expect(result.selectionStart).toEqual(result.config.indexOf('790'))
+        expect(result.selectionEnd).toEqual(result.selectionStart + 3)
+    })
+
+    it('change configuration JSON value at position will round value', () => {
+        const view = new PolygonView(Math.random(), Math.random())
+        const json = '{"changeMe": 456.123456789}'
+        const result = view.manipulateJson(json, json.indexOf('abc'), Math.random())
+        expect(result.config).toEqual(json.replace('456.123456789', '457.123457'))
+        expect(result.selectionStart).toEqual(result.config.indexOf('457.123457'))
+        expect(result.selectionEnd).toEqual(result.selectionStart + 10)
     })
 
     it('can be reconfigured', () => {

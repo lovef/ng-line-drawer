@@ -76,19 +76,17 @@ describe('Polygon', () => {
 
     it('can iterate over the circles', () => {
         const polygon = new Polygon(Point.Zero, 1, 4)
-        expect(Array.from(polygon.getCircleIterable())).toEqual([
-            polygon.getCircle(0),
-            polygon.getCircle(1),
-        ])
+        expect(Array.from(polygon.getCircleIterable()).map((a) => a.circleIndex)).toEqual([0, 1])
     })
 
     it('can iterate over a subset of the circles', () => {
         const polygon = new Polygon(Point.Zero, 1, 10)
-        expect(Array.from(polygon.getCircleIterable(1, 3))).toEqual([
-            polygon.getCircle(1),
-            polygon.getCircle(2),
-            polygon.getCircle(3),
-        ])
+        expect(Array.from(polygon.getCircleIterable(3, 2)).map((a) => a.circleIndex)).toEqual([])
+        expect(Array.from(polygon.getCircleIterable(3, 3)).map((a) => a.circleIndex)).toEqual([3])
+        expect(Array.from(polygon.getCircleIterable(0, 2)).map((a) => a.circleIndex)).toEqual([0, 1, 2])
+        expect(Array.from(polygon.getCircleIterable(1, 3)).map((a) => a.circleIndex)).toEqual([1, 2, 3])
+        expect(Array.from(polygon.getCircleIterable(0, 100)).map((a) => a.circleIndex).length).toEqual(polygon.circleCount)
+        expect(Array.from(polygon.getCircleIterable(5, 100)).map((a) => a.circleIndex).length).toEqual(polygon.circleCount)
     })
 
     it('can iterate over circles with for loop', () => {

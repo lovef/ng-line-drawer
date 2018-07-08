@@ -77,15 +77,15 @@ export class AppComponent implements OnInit {
 
         this.showOverlay()
         if (event.shiftKey) {
-            if (event.deltaY > 0) {
+            if (event.deltaY < 0) {
                 this.polygonView.rotate(Math.PI / 180)
-            } else if (event.deltaY < 0) {
+            } else if (event.deltaY > 0) {
                 this.polygonView.rotate(-Math.PI / 180)
             }
         } else {
-            if (event.deltaY > 0) {
+            if (event.deltaY < 0) {
                 this.polygonView.scale(new Point(event.x, event.y), 1.1)
-            } else if (event.deltaY < 0) {
+            } else if (event.deltaY > 0) {
                 this.polygonView.scale(new Point(event.x, event.y), 1 / 1.1)
             }
         }
@@ -93,14 +93,14 @@ export class AppComponent implements OnInit {
         this.update()
     }
 
-    onConfigMouseWheel(event: WheelEvent) {
+    onConfigMouseWheel(event) {
         event.preventDefault()
         this.showOverlay()
 
         try {
             const textArea: HTMLTextAreaElement = this.config.nativeElement
             const json = textArea.value
-            const result = this.polygonView.manipulateJson(json, textArea.selectionStart, event.deltaY)
+            const result = this.polygonView.manipulateJson(json, textArea.selectionStart, -event.deltaY)
             this.configuration = result.config
             textArea.selectionStart = result.selectionStart
             textArea.selectionEnd = result.selectionEnd

@@ -2,7 +2,7 @@
     <textarea #config tabindex="0" cols="30"
         [(ngModel)]="configuration"
         (focus)="focusConfig($event)" (blur)="blurConfig()"
-        (mousewheel)="onMouseWheel($event)">
+        (wheel)="onMouseWheel($event)">
     </textarea>
 </div>
 <canvas #canvas
@@ -10,7 +10,7 @@
     (mousedown)="onMouseDown($event)"
     (mouseup)="onMouseUp($event)"
     (mousemove)="onMousemove($event)"
-    (mousewheel)="onMouseWheel($event)"
+    (wheel)="onMouseWheel($event)"
     (touchstart)="onTouchstart($event)"
     (touchmove)="onTouchmove($event)"
     (touchend)="onTouchcancel($event)"
